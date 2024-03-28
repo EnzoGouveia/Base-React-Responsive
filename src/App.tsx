@@ -4,12 +4,26 @@ import styled from '@emotion/styled';
 import './App.css';
 
 interface PokemonData {
-  sprites: { front_default: string };
+  sprites: { 
+    versions: { 
+      'generation-v': { 
+        'black-white': { 
+          animated: { 
+            front_default: string 
+          } 
+        } 
+      } 
+    } 
+  };
   id: number;
   name: string;
   height: number;
   weight: number;
-  types: { type: { name: string } }[];
+  types: { 
+    type: { 
+      name: string 
+    } 
+  }[];
 }
 
 const Container = styled.div`
@@ -51,7 +65,8 @@ const Card = styled.div`
 
 const PokemonInfo = styled.div`
   img {
-    width: 200px;
+    width: 100px;
+    height: auto;
   }
 `;
 
@@ -106,7 +121,7 @@ const App: React.FC = () => {
         {filteredPokemonList.map((pokemon) => <Card key={pokemon.id}>
           <h2>{capitalizeFirstLetter(pokemon.name)}</h2>
           <PokemonInfo>
-            <img src={pokemon.sprites.front_default} alt={pokemon.name} />
+            <img src={pokemon.sprites.versions['generation-v']['black-white'].animated.front_default} alt={pokemon.name} />
             <p>Height: {pokemon.height / 10}m</p>
             <p>Weight: {pokemon.weight / 10}kg</p>
             <p>Types: {pokemon.types.map(type => capitalizeFirstLetter(type.type.name)).join(', ')}</p>
