@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from '@emotion/styled';
+import PokemonStats from './components/PokemonStats';
 import './App.css';
 
 interface PokemonData {
@@ -8,7 +9,8 @@ interface PokemonData {
     versions: { 
       'generation-v': { 
         'black-white': { 
-          animated: { 
+          animated: {
+            front_shiny: string; 
             front_default: string 
           } 
         } 
@@ -19,6 +21,7 @@ interface PokemonData {
   name: string;
   height: number;
   weight: number;
+  stats: [];
   types: { 
     type: { 
       name: string 
@@ -64,11 +67,23 @@ const Card = styled.div`
 `;
 
 const PokemonInfo = styled.div`
+
   img {
     width: 100px;
-    height: auto;
+    height: 100px;
   }
 `;
+
+const Atributtes = styled.div`
+  align-items: center;
+  align-text: center;
+
+  .atributtes{
+    padding: 10px;
+    width: 50px;
+    height: 50px;
+  }
+`
 
 const capitalizeFirstLetter = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -77,6 +92,7 @@ const capitalizeFirstLetter = (str: string): string => {
 const App: React.FC = () => {
   const [pokemonList, setPokemonList] = useState<PokemonData[] | null>(null);
   const [search, setSearch] = useState<string>('');
+  const [shinyStatus, setShinyStatus] = useState<{ [key: number]: boolean }>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,6 +119,13 @@ const App: React.FC = () => {
     setSearch(event.target.value);
   };
 
+  const toggleShiny = (id: number) => {
+    setShinyStatus((prev) => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
   const filteredPokemonList = pokemonList ? pokemonList.filter(pokemon =>
     pokemon.name.toLowerCase().includes(search.toLowerCase())
   ) : [];
@@ -119,12 +142,27 @@ const App: React.FC = () => {
       </InputContainer>
       <CardContainer>
         {filteredPokemonList.map((pokemon) => <Card key={pokemon.id}>
-          <h2>{capitalizeFirstLetter(pokemon.name)}</h2>
+          <img src='https://archives.bulbagarden.net/media/upload/0/0f/ShinyLAStar_Pok%C3%A9dex.png' onClick={() => toggleShiny(pokemon.id)}></img>
+          <h2>
+            {capitalizeFirstLetter(pokemon.name)}
+          </h2>
           <PokemonInfo>
-            <img src={pokemon.sprites.versions['generation-v']['black-white'].animated.front_default} alt={pokemon.name} />
+            <img src={
+              shinyStatus[pokemon.id]
+                ? pokemon.sprites.versions["generation-v"]["black-white"].animated
+                    .front_shiny
+                : pokemon.sprites.versions["generation-v"]["black-white"].animated
+                    .front_default
+            }
+            alt={pokemon.name} />
             <p>Height: {pokemon.height / 10}m</p>
             <p>Weight: {pokemon.weight / 10}kg</p>
-            <p>Types: {pokemon.types.map(type => capitalizeFirstLetter(type.type.name)).join(', ')}</p>
+            <h2>Types</h2>
+            <Atributtes>
+              {pokemon.types.map(type => <img key={pokemon.id+'pk'} className='atributtes' src={`/src/assets/atributtes/Pokemon_Type_Icon_${capitalizeFirstLetter(type.type.name)}.png`} />)}
+            </Atributtes>
+            <h2>Stats</h2>
+            <PokemonStats stats={pokemon.stats} />
           </PokemonInfo>
         </Card>
         )}
