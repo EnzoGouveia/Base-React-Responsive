@@ -1,33 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styled from '@emotion/styled';
-import PokemonStats from './components/PokemonStats';
+import SearchInput from './components/SearchInput';
+import PokemonList from './components/PokemonList';
+import PokemonData from './interfaces/PokemonData';
+import PokedexHeader from './components/Header';
 import './App.css';
-
-interface PokemonData {
-  sprites: { 
-    versions: { 
-      'generation-v': { 
-        'black-white': { 
-          animated: {
-            front_shiny: string; 
-            front_default: string 
-          } 
-        } 
-      } 
-    } 
-  };
-  id: number;
-  name: string;
-  height: number;
-  weight: number;
-  stats: [];
-  types: { 
-    type: { 
-      name: string 
-    } 
-  }[];
-}
 
 const Container = styled.div`
   display: flex;
@@ -37,57 +15,8 @@ const Container = styled.div`
 
 const InputContainer = styled.div`
   display: flex;
-  margin-bottom: 30px;
+
 `;
-
-const CardContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 300px);
-  justify-content: center;
-  gap: 20px;
-
-  @media(max-width: 1320px){
-    grid-template-columns: repeat(3, 300px);
-  }
-
-  @media(max-width: 1000px){
-    grid-template-columns: repeat(2, 300px);
-  }
-
-  @media(max-width: 680px){
-    grid-template-columns: repeat(1, 300px);
-  }
-`;
-
-const Card = styled.div`
-  background-color: black;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-`;
-
-const PokemonInfo = styled.div`
-
-  img {
-    width: 100px;
-    height: 100px;
-  }
-`;
-
-const Atributtes = styled.div`
-  align-items: center;
-  align-text: center;
-
-  .atributtes{
-    padding: 10px;
-    width: 50px;
-    height: 50px;
-  }
-`
-
-const capitalizeFirstLetter = (str: string): string => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
 
 const App: React.FC = () => {
   const [pokemonList, setPokemonList] = useState<PokemonData[] | null>(null);
@@ -132,41 +61,11 @@ const App: React.FC = () => {
 
   return (
     <Container>
+      <PokedexHeader/>
       <InputContainer>
-        <input
-          type="text"
-          placeholder="Search Pokémon"
-          value={search}
-          onChange={handleSearchChange} 
-        />
+        <SearchInput value={search} onChange={handleSearchChange} />
       </InputContainer>
-      <CardContainer>
-        {filteredPokemonList.map((pokemon) => <Card key={pokemon.id}>
-          <img src='https://archives.bulbagarden.net/media/upload/0/0f/ShinyLAStar_Pok%C3%A9dex.png' onClick={() => toggleShiny(pokemon.id)}></img>
-          <h2>
-            {capitalizeFirstLetter(pokemon.name)}
-          </h2>
-          <PokemonInfo>
-            <img src={
-              shinyStatus[pokemon.id]
-                ? pokemon.sprites.versions["generation-v"]["black-white"].animated
-                    .front_shiny
-                : pokemon.sprites.versions["generation-v"]["black-white"].animated
-                    .front_default
-            }
-            alt={pokemon.name} />
-            <p>Height: {pokemon.height / 10}m</p>
-            <p>Weight: {pokemon.weight / 10}kg</p>
-            <h2>Types</h2>
-            <Atributtes>
-              {pokemon.types.map(type => <img key={pokemon.id+'pk'} className='atributtes' src={`/src/assets/atributtes/Pokemon_Type_Icon_${capitalizeFirstLetter(type.type.name)}.png`} />)}
-            </Atributtes>
-            <h2>Stats</h2>
-            <PokemonStats stats={pokemon.stats} />
-          </PokemonInfo>
-        </Card>
-        )}
-      </CardContainer>
+      <PokemonList pokemonList={filteredPokemonList} shinyStatus={shinyStatus} toggleShiny={toggleShiny} />
     </Container>
   );
 };

@@ -32,7 +32,7 @@ const PokemonStats: React.FC<Props> = ({ stats }) => {
 
   return (
     <RadarChart
-    cx={130}
+    cx={150}
     cy={100}
     outerRadius={80}
     width={300}
